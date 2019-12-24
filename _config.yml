@@ -3,6 +3,6 @@ logo: "/images/logo.png?raw=true" # your photo (or logo) here
 description: > # your text below (remove <br> elements if you don't need line breaks)
   Graduate student studying Urban Spatial Analytics at the University of Pennsylvania
   <br><br>
-  <a href="www.linkedin.com/in/yujing-wu-04150498">View My LinkedIn Profile</a> 
+  <a href="https://www.linkedin.com/in/yujing-wu-04150498/">View My LinkedIn Profile</a> 
   
 theme: jekyll-theme-minimal
