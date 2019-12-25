@@ -14,5 +14,11 @@
 <img src="images/piracy.JPG?raw=true"/>
 
 ---
+
+### Machine Learning in R 
+[Predicting EMS Calls in Virginia Beach](/html/Predicting EMS.html)
+<img src="images/EMS calls.gif?raw=true"/>
+
+---
 <p style="font-size:11px">Page template forked from <a href="https://github.com/evanca/quick-portfolio">evanca</a></p>
 <!-- Remove above link if you don't want to attibute -->
