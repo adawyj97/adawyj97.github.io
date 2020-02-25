@@ -17,6 +17,7 @@
 
 ### ArcGIS & Adobe Illustrator
 [Large Whale Species Killed or Injured in Ship Strikes](/pdf/Mapping Ship Strikes.pdf)
+<img src="images/whale.jpg?raw=true"/>
 
 ---
 
