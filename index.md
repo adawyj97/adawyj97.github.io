@@ -15,6 +15,12 @@
 
 ---
 
+### ArcGIS & Adobe Illustrator
+[Large whale species killed or injured in ship strikes](/pdf/Mapping Ship Strikes.pdf)
+<img src="images/whale.JPG?raw=true"/>
+
+---
+
 ### Machine Learning in R 
 [Predicting EMS Calls in Virginia Beach](/html/Predicting EMS.html)
 <img src="images/EMS calls.gif?raw=true"/>
