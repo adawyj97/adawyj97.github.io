@@ -2,6 +2,13 @@
 
 ---
 
+### JavaScript 
+
+[Visualizing Sea Level Rise in Tuvalu](/CapstoneProject/index.html)
+<img src="images/Sea level rise.png?raw=true"/>
+
+---
+
 ### Google Earth Engine
 
 [Suitability Analysis for Floodplain Restoration in the Conterminous US](/pdf/Floodplain suitability analysis.pdf)
