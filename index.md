@@ -5,7 +5,7 @@
 ### JavaScript 
 
 [Visualizing Sea Level Rise in Tuvalu](/CapstoneProject/index.html)
-<img src="images/rsz_sea_level_rise.png?raw=true"/>
+<img src="images/rsz_3sea_level_rise.png?raw=true"/>
 
 ---
 
