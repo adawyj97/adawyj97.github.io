@@ -1,8 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 ## Projects
 
 ---
@@ -10,7 +5,7 @@ output:
 ### JavaScript 
 
 [Visualizing Sea Level Rise in Tuvalu](/CapstoneProject/index.html)
-<img src="images/rsz_sea_level_rise.jpg?raw=true"/>
+<img src="images/rsz_sea_level_rise.png?raw=true"/>
 
 ---
 
