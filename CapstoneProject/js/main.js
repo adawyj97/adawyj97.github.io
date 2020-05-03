@@ -140,29 +140,43 @@ $(document).ready(function() {
         map.setFilter('fishnet', ["==", predicate, 1]);
       };
 
+      var defineColor = function() {
+        var maxNum = food_on * food_weight * 5 + trans_on * trans_weight * 5 + buildings_on * buildings_weight * 5;
+        var interval1 = 0;
+        var interval2 = 1/5 * maxNum;
+        var interval3 = 2/5 * maxNum;
+        var interval4 = 3/5 * maxNum;
+        var interval5 = 4/5 * maxNum;
+        var interval6 = maxNum;
+        var colorList = [interval1, interval2, interval3, interval4, interval5, interval6];
+        return colorList;
+      };
+
+      var updateLegend = function(colorList) {
+        for (i=0; i<6; i++) {
+          $('#impact-legend > div').eq(i)[0].lastChild.nodeValue = colorList[5-i];
+        }
+      };
+
       var impact = function() {
+        var colorList = defineColor();
+        updateLegend(colorList);
         map.setPaintProperty('fishnet', 'fill-color',  [
           'interpolate',
           ['linear'],
           ["+",["*", ['get', 'Food_recla'], food_on, food_weight] , ["*", ['get', 'Tran_recla'], trans_on, trans_weight], ["*", ['get', 'Buil_recla'], buildings_on, buildings_weight]],
-          0,
-          '#fff7fb',
-          1,
-          '#ece7f2',
-          3,
-          '#d0d1e6',
-          5,
-          '#a6bddb',
-          7,
-          '#74a9cf',
-          9,
-          '#3690c0',
-          11,
-          '#0570b0',
-          13,
-          '#045a8d',
-          15,
-          '#023858'
+          colorList[0],
+          '#fff0ea',
+          colorList[1],
+          '#abd5dc',
+          colorList[2],
+          '#81b0cd',
+          colorList[3],
+          '#5e8abe',
+          colorList[4],
+          '#3c65ae',
+          colorList[5],
+          '#00429d'
         ]);
       };
 
