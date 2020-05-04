@@ -16,6 +16,8 @@
         <p id="description"></p>
       </div>
       <label for="islands" style="color:white">Select an island to view potential inundation</label>
+      <br>
+      <br>
       <select id="islands">
         <option value="Funafuti">Funafuti</option>
         <option value="Nanumea">Nanumea</option>
@@ -32,7 +34,10 @@
         <h1 type="text" id="slidervalue" style="color:white">test</h1>
       </div>
       <div class="impacts">
-        <h1 style="color:white; font-size:25px">Transportation</hr>
+        <div class="help-tip">
+          <p>Turn on the toggle switches below to view the impacts of the inundation on the transportation, food security, and infrastructure in Tuvalu. Adjust the sliders to change the weight for each sector in the calculation.</p>
+        </div>
+        <h1 class="impacts_label" style="color:white; font-size:25px">Transportation</hr>
         <label class="switch">
           <input type="checkbox" id="transportation_switch">
           <span class="slider toggle"></span>

@@ -3,7 +3,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10',
     center: [179.200993, -8.520496],
-    zoom: 16,
+    zoom: 15,
     pitch: 50,
     bearing: -5.6,
     container: 'map',
@@ -105,155 +105,207 @@ $(document).ready(function() {
               15.05,
               ['get', 'min_height']
               ],
-              'fill-extrusion-opacity': 0.6
+              'fill-extrusion-opacity': 0.9
             }
           }, labelLayerId
           );
 
 
-          map.addLayer({'id': 'fishnet',
-            'type': 'fill',
-            'source': 'elevation',
-            'source-layer': 'DEM_grid_attri-4xfkep',
-            'layout': {},
-            'paint': {
-              'fill-color': '#088',
-              'fill-opacity': 0.9
-            },
-            'filter': ["==", `bel_${$("#myRange").val()}0_con`.slice(0, 10), 1]
+        map.addLayer({'id': 'fishnet',
+        'type': 'fill-extrusion',
+        'source': 'elevation',
+        'source-layer': 'DEM_grid_attri-4xfkep',
+        'layout': {},
+        'paint': {
+          'fill-extrusion-color': '#088',
+          'fill-extrusion-opacity': 0.7
+          },
+          'filter': ["==", `bel_${$("#myRange").val()}0_con`.slice(0, 10), 1]
           }, '3d-buildings');
+
+        map.addLayer({'id': 'fishnet-outline',
+          'type': 'line',
+          'source': 'elevation',
+          'source-layer': 'DEM_grid_attri-4xfkep',
+          'layout': {},
+          'paint': {
+            'line-color': '#7FB3D5'
+          },
+          'filter': ["==", `bel_${$("#myRange").val()}0_con`.slice(0, 10), 1]
+        }, 'fishnet');
+
+
+        var popup = new mapboxgl.Popup({
+          closeButton: false,
+          closeOnClick: false
         });
 
-      document.getElementById("islands").onchange = function() {
-        var selected = $("#islands option:selected").text();
-        map.flyTo({
-          center: islandLoc[selected].cor,
-          zoom: islandLoc[selected].zoom,
-          essential: true
+
+        function identifyFeatures(location, layer) {
+          var identifiedFeatures = map.queryRenderedFeatures(location.point, {layers: layer});
+          popup.remove();
+          if (identifiedFeatures != '') {
+            var popupText = `Elevation: ${identifiedFeatures[0].properties.elevation} m <br> Total road length: ${identifiedFeatures[0].properties.SUM_Highwa} m <br> Total number of buildings: ${identifiedFeatures[0].properties.Buildings} <br> Total number of food-related amenities: ${identifiedFeatures[0].properties.Grocery + identifiedFeatures[0].properties.Food_amen}`;
+            popup.setLngLat(location.lngLat)
+            .setHTML(popupText)
+            .addTo(map);
+          }
+      }
+
+        map.on('mousemove', function(e) {
+          identifyFeatures(e, ['fishnet']);
         });
-      };
 
-      document.getElementById("myRange").onchange= function() {
-        var elev = $("#myRange").val();
-        var predicate = `bel_${elev}0_con`.slice(0, 10);
-        $("#slidervalue").text(`${elev} m`);
-        map.setFilter('fishnet', ["==", predicate, 1]);
-      };
+        document.getElementById("islands").onchange = function() {
+          var selected = $("#islands option:selected").text();
+          map.flyTo({
+            center: islandLoc[selected].cor,
+            zoom: islandLoc[selected].zoom,
+            essential: true
+          });
+        };
 
-      var defineColor = function() {
-        var maxNum = food_on * food_weight * 5 + trans_on * trans_weight * 5 + buildings_on * buildings_weight * 5;
-        var interval1 = 0;
-        var interval2 = 1/5 * maxNum;
-        var interval3 = 2/5 * maxNum;
-        var interval4 = 3/5 * maxNum;
-        var interval5 = 4/5 * maxNum;
-        var interval6 = maxNum;
-        var colorList = [interval1, interval2, interval3, interval4, interval5, interval6];
-        return colorList;
-      };
+        document.getElementById("myRange").onchange= function() {
+          var elev = $("#myRange").val();
+          var predicate = `bel_${elev}0_con`.slice(0, 10);
+          $("#slidervalue").text(`${elev} m`);
+          map.setFilter('fishnet', ["==", predicate, 1]);
+          map.setFilter('fishnet-outline', ["==", predicate, 1]);
+        };
 
-      var updateLegend = function(colorList) {
-        for (i=0; i<6; i++) {
-          $('#impact-legend > div').eq(i)[0].lastChild.nodeValue = colorList[5-i];
-        }
-      };
+        var defineColor = function() {
+          var maxNum = food_on * food_weight * 5 + trans_on * trans_weight * 5 + buildings_on * buildings_weight * 5;
+          var interval1 = 0;
+          var interval2 = 1/5 * maxNum;
+          var interval3 = 2/5 * maxNum;
+          var interval4 = 3/5 * maxNum;
+          var interval5 = 4/5 * maxNum;
+          var interval6 = maxNum;
+          var colorList = [interval1, interval2, interval3, interval4, interval5, interval6];
+          return colorList;
+        };
 
-      var impact = function() {
-        var colorList = defineColor();
-        updateLegend(colorList);
-        map.setPaintProperty('fishnet', 'fill-color',  [
-          'interpolate',
-          ['linear'],
-          ["+",["*", ['get', 'Food_recla'], food_on, food_weight] , ["*", ['get', 'Tran_recla'], trans_on, trans_weight], ["*", ['get', 'Buil_recla'], buildings_on, buildings_weight]],
-          colorList[0],
-          '#fff0ea',
-          colorList[1],
-          '#abd5dc',
-          colorList[2],
-          '#81b0cd',
-          colorList[3],
-          '#5e8abe',
-          colorList[4],
-          '#3c65ae',
-          colorList[5],
-          '#00429d'
-        ]);
-      };
+        var updateLegend = function(colorList) {
+          for (i=0; i<6; i++) {
+            $('#impact-legend > div').eq(i)[0].lastChild.nodeValue = colorList[5-i];
+          }
+        };
 
-      var controlweights = function() {
-        if (trans_on == 1) {
-          $(".slidecontainer.trans").show();
-        }
+        var impact = function() {
+          var colorList = defineColor();
+          updateLegend(colorList);
+          map.setLayoutProperty('fishnet-outline', 'visibility', 'none');
+          map.setPaintProperty('fishnet', 'fill-extrusion-color',  [
+            'interpolate',
+            ['linear'],
+            ["+",["*", ['get', 'Food_recla'], food_on, food_weight] , ["*", ['get', 'Tran_recla'], trans_on, trans_weight], ["*", ['get', 'Buil_recla'], buildings_on, buildings_weight]],
+            colorList[0],
+            '#fff0ea',
+            colorList[1],
+            '#abd5dc',
+            colorList[2],
+            '#81b0cd',
+            colorList[3],
+            '#5e8abe',
+            colorList[4],
+            '#3c65ae',
+            colorList[5],
+            '#00429d'
+          ]);
+          map.setPaintProperty('fishnet', 'fill-extrusion-height', [
+            'interpolate',
+            ['linear'],
+            ["+",["*", ['get', 'Food_recla'], food_on, food_weight] , ["*", ['get', 'Tran_recla'], trans_on, trans_weight], ["*", ['get', 'Buil_recla'], buildings_on, buildings_weight]],
+            colorList[0],
+            20,
+            colorList[1],
+            40,
+            colorList[2],
+            60,
+            colorList[3],
+            80,
+            colorList[4],
+            120,
+            colorList[5],
+            140
+          ]);
+        };
 
-        if (food_on == 1) {
-            $(".slidecontainer.food").show();
-        }
+        var controlweights = function() {
+          if (trans_on == 1) {
+            $(".slidecontainer.trans").show();
+          }
 
-        if (buildings_on == 1) {
-            $(".slidecontainer.buildings").show();
-        }
-      };
+          if (food_on == 1) {
+              $(".slidecontainer.food").show();
+            }
 
-      var turnoffweights = function() {
-        $(".slidecontainer.buildings").hide();
-        $("#weight_build").val(1);
-        buildings_weight = 1;
-        $(".slidecontainer.food").hide();
-        $("#weight_food").val(1);
-        food_weight = 1;
-        $(".slidecontainer.trans").hide();
-        $("#weight_trans").val(1);
-        trans_weight = 1;
-        if (food_on + trans_on + buildings_on == 0) {
-          map.setPaintProperty('fishnet', 'fill-color', '#088');
-        } else {
-          impact();
-        }
-      };
+            if (buildings_on == 1) {
+              $(".slidecontainer.buildings").show();
+            }
+          };
 
-      $("#weight_food").on('change', function() {
-        food_weight = Number($("#weight_food").val());
-        impact();
-      });
-
-      $("#weight_trans").on('change', function() {
-        trans_weight = Number($("#weight_trans").val());
-        impact();
-      });
-
-      $("#weight_build").on('change', function() {
-        buildings_weight = Number($("#weight_build").val());
-        impact();
-      });
-
-      $("#food_switch").on('change', function(){
-        if ($(this).is(':checked')) {
-          $("#impact-legend").show();
-          food_on = 1;
-          num_switch += 1;
-        } else {
-          food_on = 0;
-          num_switch -= 1;
+        var turnoffweights = function() {
+          $(".slidecontainer.buildings").hide();
+          $("#weight_build").val(1);
+          buildings_weight = 1;
           $(".slidecontainer.food").hide();
           $("#weight_food").val(1);
           food_weight = 1;
-        }
-        if (food_on + trans_on + buildings_on == 0) {
-          $("#impact-legend").hide();
-          map.setPaintProperty('fishnet', 'fill-color', '#088');
-        } else {
+          $(".slidecontainer.trans").hide();
+          $("#weight_trans").val(1);
+          trans_weight = 1;
+          if (food_on + trans_on + buildings_on == 0) {
+            map.setPaintProperty('fishnet', 'fill-extrusion-color', '#088');
+          } else {
+            impact();
+          }
+        };
+
+        $("#weight_food").on('change', function() {
+          food_weight = Number($("#weight_food").val());
           impact();
-        }
+        });
 
-        if (num_switch > 1) {
-          controlweights();
-        } else {
-          turnoffweights();
-        }
-      });
+        $("#weight_trans").on('change', function() {
+          trans_weight = Number($("#weight_trans").val());
+          impact();
+        });
 
+        $("#weight_build").on('change', function() {
+          buildings_weight = Number($("#weight_build").val());
+          impact();
+        });
 
-      $("#transportation_switch").on('change', function() {
+        $("#food_switch").on('change', function(){
+          if ($(this).is(':checked')) {
+            $("#impact-legend").show();
+            food_on = 1;
+            num_switch += 1;
+          } else {
+            food_on = 0;
+            num_switch -= 1;
+            $(".slidecontainer.food").hide();
+            $("#weight_food").val(1);
+            food_weight = 1;
+          }
+          if (food_on + trans_on + buildings_on == 0) {
+            $("#impact-legend").hide();
+            map.setPaintProperty('fishnet', 'fill-extrusion-color', '#088');
+            map.setPaintProperty('fishnet', 'fill-extrusion-height', 0);
+            map.setLayoutProperty('fishnet-outline', 'visibility', 'visible');
+          } else {
+            impact();
+          }
+
+          if (num_switch > 1) {
+            controlweights();
+          } else {
+            turnoffweights();
+          }
+        });
+
+        $("#transportation_switch").on('change', function() {
         if ($(this).is(':checked')) {
           $("#impact-legend").show();
           trans_on = 1;
@@ -267,7 +319,9 @@ $(document).ready(function() {
         }
         if (food_on + trans_on + buildings_on == 0) {
           $("#impact-legend").hide();
-          map.setPaintProperty('fishnet', 'fill-color', '#088');
+          map.setPaintProperty('fishnet', 'fill-extrusion-color', '#088');
+          map.setPaintProperty('fishnet', 'fill-extrusion-height', 0);
+          map.setLayoutProperty('fishnet-outline', 'visibility', 'visible');
         } else {
           impact();
         }
@@ -278,7 +332,7 @@ $(document).ready(function() {
         }
       });
 
-      $("#infrastructure_switch").on('change', function() {
+        $("#infrastructure_switch").on('change', function() {
         if ($(this).is(':checked')) {
           $("#impact-legend").show();
           buildings_on = 1;
@@ -292,7 +346,9 @@ $(document).ready(function() {
         }
         if (food_on + trans_on + buildings_on == 0) {
           $("#impact-legend").hide();
-          map.setPaintProperty('fishnet', 'fill-color', '#088');
+          map.setPaintProperty('fishnet', 'fill-extrusion-color', '#088');
+          map.setPaintProperty('fishnet', 'fill-extrusion-height', 0);
+          map.setLayoutProperty('fishnet-outline', 'visibility', 'visible');
         } else {
           impact();
         }
@@ -303,18 +359,12 @@ $(document).ready(function() {
         }
       });
 
-      map.on('click', 'fishnet', function(e) {
-        new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(`Elevation: ${e.features[0].properties.elevation} m <br> Total road length: ${e.features[0].properties.SUM_Highwa} m <br> Total number of buildings: ${e.features[0].properties.Buildings} <br> Total number of food-related amenities: ${e.features[0].properties.Grocery + e.features[0].properties.Food_amen}`)
-        .addTo(map);
-      });
-
-      map.on('mouseenter', 'fishnet', function() {
+        map.on('mouseenter', 'fishnet', function() {
         map.getCanvas().style.cursor = 'pointer';
       });
 
-      map.on('mouseleave', 'fishnet', function() {
+        map.on('mouseleave', 'fishnet', function() {
         map.getCanvas().style.cursor = '';
       });
     });
+});
