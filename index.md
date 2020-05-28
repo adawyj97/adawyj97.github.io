@@ -5,6 +5,12 @@ output:
 ## Projects
 
 ---
+### Machine Learning in Python
+
+[Slum Classification and Identification in Argentina](/pdf/slum_prediction.pdf)
+<img src="images/slum_prediction.png?raw=true"/>
+
+---
 
 ### JavaScript 
 
